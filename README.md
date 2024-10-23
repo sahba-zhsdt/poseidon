@@ -125,6 +125,8 @@ huggingface-cli download camlab-ethz/<DATASET IDENTIFIER FROM PAPER> --repo-type
 
 This will download a specific dataset to the specified `LOCAL DIRECTORY`. After download, you need to assemble the datasets to the format expected by the code; for that, we refer to the README in the respective dataset repository. After assembly, remove the chunked dataset files, as they are not needed for training, and place the assembled dataset at the path you specify as `--data_path` for the training/inference script. You may also specify the 🤗 Hub cache location by specifying the environment variable `HF_HOME` as this is where the download will be performed to.
 
+export HF_HOME="/local/disk1/poseidon/HF"
+
 ### Adding your own dataset
 
 We encourage adding your own datasets. For that, you can subclass from [BaseDataset and BaseTimeDataset](scOT/problems/base.py) and add it to the `get_dataset` selector method. You can then use the dataset in the training script by specifying the dataset identifier in the config file.

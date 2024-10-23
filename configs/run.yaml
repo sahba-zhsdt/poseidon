@@ -1,5 +1,5 @@
 dataset:
-  value: "wave.Layer"
+  value: "fluids.compressible.Riemann.time"
 num_trajectories:
   value: 128
 model_name:
