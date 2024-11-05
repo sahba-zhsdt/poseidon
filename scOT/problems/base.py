@@ -104,6 +104,8 @@ def get_dataset(dataset, **kwargs):
                         raise ValueError(f"Unknown dataset {dataset}")
                 else:
                     raise ValueError(f"Unknown dataset {dataset}")
+            elif "Bubble" in dataset:
+                from .fluids.compressible import Bubble as dset
             else:
                 raise ValueError(f"Unknown dataset {dataset}")
         else:
@@ -111,7 +113,7 @@ def get_dataset(dataset, **kwargs):
         if "out" in dataset:
             default_time_settings = {"max_num_time_steps": 10, "time_step_size": 2}
         else:
-            default_time_settings = {"max_num_time_steps": 7, "time_step_size": 2}
+            default_time_settings = {"max_num_time_steps": 150, "time_step_size": 2}
         if "tracer" in dataset:
             tracer = True
         else:

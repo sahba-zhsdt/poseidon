@@ -516,7 +516,7 @@ class ScOTLayer(nn.Module):
             attn_mask,
             head_mask,
             output_attentions=output_attentions,
-        )
+        ) # after att. mult. we have output with shape 160, 256, 96
 
         attention_output = attention_outputs[0]
 
@@ -525,7 +525,7 @@ class ScOTLayer(nn.Module):
         )
         shifted_windows = window_reverse(
             attention_windows, self.window_size, height_pad, width_pad
-        )
+        ) # turns back from [160, 256, 96] to [40, 32, 32, 96]
 
         # reverse cyclic shift
         if self.shift_size > 0:

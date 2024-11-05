@@ -3,6 +3,7 @@ import h5py
 import copy
 from scOT.problems.base import BaseTimeDataset, BaseDataset
 from scOT.problems.fluids.normalization_constants import CONSTANTS
+from jaxfluids_postprocess import load_data
 
 
 class Airfoil(BaseDataset):
@@ -191,17 +192,18 @@ class RayleighTaylor(BaseTimeDataset):
 class CompressibleBase(BaseTimeDataset):
     def __init__(self, file_path, *args, tracer=False, **kwargs):
         super().__init__(*args, **kwargs)
-        assert self.max_num_time_steps * self.time_step_size <= 20
+        assert self.max_num_time_steps * self.time_step_size <= 300
 
-        self.N_max = 10000
-        self.N_val = 120
-        self.N_test = 240
-        self.resolution = 128
+        self.N_max = 3
+        self.N_val = 1
+        self.N_test = 1
+        self.resolution = 352 # here will be 352 in new data
         self.tracer = tracer
 
         data_path = self.data_path + file_path
         data_path = self._move_to_local_scratch(data_path)
         self.reader = h5py.File(data_path, "r")
+      
 
         self.constants = copy.deepcopy(CONSTANTS)
 
@@ -233,11 +235,11 @@ class CompressibleBase(BaseTimeDataset):
             .reshape(4, self.resolution, self.resolution)
         )
 
-        inputs[3] = inputs[3] - self.mean_pressure
-        label[3] = label[3] - self.mean_pressure
+        # inputs[3] = inputs[3] - self.mean_pressure
+        # label[3] = label[3] - self.mean_pressure
 
-        inputs = (inputs - self.constants["mean"]) / self.constants["std"]
-        label = (label - self.constants["mean"]) / self.constants["std"]
+        # inputs = (inputs - self.constants["mean"]) / self.constants["std"]
+        # label = (label - self.constants["mean"]) / self.constants["std"]
 
         if self.tracer:
             input_tracer = (
@@ -305,4 +307,14 @@ class RiemannKelvinHelmholtz(CompressibleBase):
             raise NotImplementedError(
                 "Tracer not implemented for RiemannKelvinHelmholtz"
             )
+        super().__init__(file_path, *args, tracer=tracer, **kwargs)
+        
+class Bubble(CompressibleBase):
+    def __init__(self, *args, tracer=False, **kwargs):
+        # self.mean_pressure = 0.215
+        self.mean_pressure = 0.0
+        file_path = "/JXF.nc"
+        # file_path = "/CE-RP.nc"
+        if tracer:
+            raise NotImplementedError("Tracer not implemented for Bubble")
         super().__init__(file_path, *args, tracer=tracer, **kwargs)

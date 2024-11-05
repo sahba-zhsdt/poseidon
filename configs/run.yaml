@@ -1,7 +1,7 @@
 dataset:
-  value: "fluids.compressible.Riemann.time"
+  value: "fluids.compressible.Bubble.time"
 num_trajectories:
-  value: 128
+  value: 1
 model_name:
   value: "B"
 lr:
