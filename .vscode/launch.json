@@ -1,0 +1,57 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "samples",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./samples.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "poseidon",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./scOT/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--config",
+                "./configs/run.yaml",
+                "--data_path",
+                "./data",
+                "--checkpoint_path",
+                "./ckpts",
+                "--wandb_run_name",
+                "poseidon-test-ursell",
+            ]
+        },
+        {
+            "name": "poseidon-infer",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./scOT/inference.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--model_path",
+                "./ckpts/scOT/posiedon-test-ursell",
+                "--ckpt_dir",
+                "./ckpts",
+                "--data_path",
+                "./data",
+                "--dataset",
+                "fluids.compressible.Bubble.time",
+                "--mode",
+                "eval",
+                "--append_time",
+                "--file",
+                ""
+            ]
+        }
+    ]
+}

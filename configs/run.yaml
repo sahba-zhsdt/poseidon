@@ -21,6 +21,6 @@ early_stopping_patience:
 num_epochs:
   value: 200
 batch_size:
-  value: 40
+  value: 5
 max_grad_norm:
   value: 5.0

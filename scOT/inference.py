@@ -24,6 +24,7 @@ from scOT.model import ScOT
 from scOT.trainer import TrainingArguments, Trainer
 from scOT.problems.base import get_dataset, BaseTimeDataset
 from scOT.metrics import relative_lp_error, lp_error
+from scOT.train import create_predictions_plot
 
 
 SEED = 0
@@ -70,6 +71,7 @@ def get_trainer(
         per_device_eval_batch_size=batch_size,
         eval_accumulation_steps=16,
         dataloader_num_workers=workers,
+        log_level="info"
     )
     time_involved = isinstance(dataset, BaseTimeDataset)
 
@@ -347,7 +349,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--file",
         type=str,
-        required=True,
+        required=False,
         help="File to load/write to. May also be a directory to save samples.",
     )
     parser.add_argument(
@@ -364,7 +366,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=64,
+        default=5,
         help="Batch size for evaluation.",
     )
     parser.add_argument(
@@ -388,7 +390,7 @@ if __name__ == "__main__":
         "--ar_steps",
         type=int,
         nargs="+",
-        default=[1],
+        default=[10],
         help="Number of autoregressive steps to take. A single int n is interpreted as taking n homogeneous steps, a list of ints [j_0, j_1, ...] is interpreted as taking a step of size j_i.",
     )
     parser.add_argument(
@@ -477,6 +479,7 @@ if __name__ == "__main__":
         help="Filter runs for number of training trajectories. Only relevant if mode==eval_sweep or save_samples_sweep.",
     )
     params = parser.parse_args()
+    
     if len(params.ar_steps) == 1:
         params.ar_steps = params.ar_steps[0]
         ar_steps = params.ar_steps
@@ -488,6 +491,8 @@ if __name__ == "__main__":
     dataset_kwargs = {}
     if params.just_velocities:
         dataset_kwargs["just_velocities"] = True
+        
+        
     if params.mode == "save_samples":
         dataset = get_test_set(
             params.dataset,
@@ -625,7 +630,7 @@ if __name__ == "__main__":
                 dataset,
                 full_data=params.full_data,
             )
-            _, _, metrics = rollout(
+            predictions, label_ids, metrics = rollout(
                 trainer,
                 dataset,
                 ar_steps=params.ar_steps,
@@ -942,9 +947,60 @@ if __name__ == "__main__":
                     )
                 )
 
-        if os.path.exists(params.file):
-            df = pd.read_csv(params.file)
-        else:
-            df = pd.DataFrame()
-        df = pd.concat([df, pd.DataFrame(data)], ignore_index=True)
-        df.to_csv(params.file, index=False)
+    # some other operation with data should be done here!
+    
+    print("Testing...")
+    
+    time_involved = True
+    RANK = int(os.environ.get("LOCAL_RANK", -1))
+    out_dist_test_dataset = None
+      
+    if time_involved:
+        
+        test_set_kwargs = {
+        "max_num_time_steps": 1,
+        "time_step_size": 14,
+        "allowed_time_transitions": [1],
+            }
+        out_test_set_kwargs = {
+            "max_num_time_steps": 1,
+            "time_step_size": 20,
+            "allowed_time_transitions": [1],
+            }
+        
+    
+    if RANK == 0 or RANK == -1:
+        metrics = {}
+        for key, value in metrics.items():
+             metrics["test/" + key[1:]] = value
+        wandb.log(metrics)
+        create_predictions_plot(
+            predictions,
+            label_ids,
+            wandb_prefix="test",
+            )
+
+    # evaluate on out-of-distribution test set
+    if out_dist_test_dataset is not None:
+        predictions = trainer.predict(out_dist_test_dataset, metric_key_prefix="")
+        if RANK == 0 or RANK == -1:
+            metrics = {}
+            for key, value in predictions.metrics.items():
+                metrics["test_out_dist/" + key[1:]] = value
+            wandb.log(metrics)
+            create_predictions_plot(
+                predictions.predictions,
+                predictions.label_ids,
+                wandb_prefix="test_out_dist",
+                )
+        ######
+        
+        # if os.path.exists(params.file):
+        #     df = pd.read_csv(params.file)
+        # else:
+        #     df = pd.DataFrame()
+        # df = pd.concat([df, pd.DataFrame(data)], ignore_index=True)
+        # df.to_csv(params.file, index=False)
+
+
+exit()

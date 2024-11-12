@@ -3,7 +3,7 @@ import h5py
 import copy
 from scOT.problems.base import BaseTimeDataset, BaseDataset
 from scOT.problems.fluids.normalization_constants import CONSTANTS
-from jaxfluids_postprocess import load_data
+# from jaxfluids_postprocess import load_data
 
 
 class Airfoil(BaseDataset):

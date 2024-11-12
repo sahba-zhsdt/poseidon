@@ -450,7 +450,11 @@ class Trainer(Trainer_):
             self.output_all_steps = True
 
     def _model_forward(self, model, inputs):
-        if self.ar_steps is not None and model.config.use_conditioning:
+        
+        temp = hasattr(model, 'config')
+        temp2 = hasattr(self, 'ar_steps')
+        st = self.ar_steps
+        if self.ar_steps is not None and hasattr(model, 'config') and model.config.use_conditioning:
             channel_difference = (
                 model.config.num_channels > model.config.num_out_channels
             )

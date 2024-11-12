@@ -14,10 +14,12 @@ import psutil
 import os
 
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
+# temp = os.environ.get("ACCELERATE_USE_FSDP", "false")
 import yaml
 import matplotlib.pyplot as plt
 import transformers
 from accelerate.utils import broadcast_object_list
+from accelerate import Accelerator
 from scOT.trainer import TrainingArguments, Trainer
 from transformers import EarlyStoppingCallback
 from scOT.model import ScOT, ScOTConfig
@@ -30,7 +32,10 @@ SEED = 0
 torch.manual_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
-
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# accelerator = Accelerator()
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = accelerator.device
 
 MODEL_MAP = {
     "T": {
@@ -309,7 +314,7 @@ if __name__ == "__main__":
         save_total_limit=1,
         seed=SEED,
         fp16=False,
-        dataloader_num_workers=0,
+        dataloader_num_workers=CPU_CORES,
         load_best_model_at_end=True,
         metric_for_best_model="loss",
         greater_is_better=False,
@@ -329,10 +334,12 @@ if __name__ == "__main__":
 
     if params.finetune_from is not None:
         model = ScOT.from_pretrained(
-            params.finetune_from, config=model_config, ignore_mismatched_sizes=True
+            params.finetune_from, config=model_config, ignore_mismatched_sizes=True, force_download=True,
         )
     else:
         model = ScOT(model_config)
+        
+    # model.to(device)
     num_params = get_num_parameters(model)
     config["num_params"] = num_params
     num_params_no_embed = get_num_parameters_no_embed(model)
