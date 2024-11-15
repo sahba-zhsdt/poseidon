@@ -1,5 +1,5 @@
 dataset:
-  value: "fluids.compressible.Bubble.time"
+  value: "fluids.compressible.Bubble.time.out"
 num_trajectories:
   value: 1
 model_name:

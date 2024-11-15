@@ -454,9 +454,9 @@ class Trainer(Trainer_):
         temp = hasattr(model, 'config')
         temp2 = hasattr(self, 'ar_steps')
         st = self.ar_steps
-        if self.ar_steps is not None and hasattr(model, 'config') and model.config.use_conditioning:
+        if self.ar_steps is not None and hasattr(model.module, 'config') and model.module.config.use_conditioning:
             channel_difference = (
-                model.config.num_channels > model.config.num_out_channels
+                model.module.config.num_channels > model.module.config.num_out_channels
             )
             # TODO: if outputs is not a dataclass this will break
             if isinstance(self.ar_steps, int):
@@ -691,6 +691,19 @@ class Trainer(Trainer_):
                 )
             else:
                 ignore_keys = []
+                
+        # # label control
+        # import matplotlib.pyplot as plt
+        # plt.figure(figsize=(10, 10))
+        # for t in range(10):
+        #     # t+=50
+        #     plt.contourf(inputs["labels"][t,3,:,:].cpu().numpy().T)
+        #     plt.title("vy real")
+        #     plt.xlabel("X-axis")
+        #     plt.ylabel("Y-axis")
+        #     plt.savefig("./velyveri.png")
+        
+        # ###
 
         # labels may be popped when computing the loss (label smoothing for instance) so we grab them first.
         if has_labels or loss_without_labels:

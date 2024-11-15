@@ -192,7 +192,7 @@ class RayleighTaylor(BaseTimeDataset):
 class CompressibleBase(BaseTimeDataset):
     def __init__(self, file_path, *args, tracer=False, **kwargs):
         super().__init__(*args, **kwargs)
-        assert self.max_num_time_steps * self.time_step_size <= 300
+        assert self.max_num_time_steps * self.time_step_size <= 20
 
         self.N_max = 3
         self.N_val = 1

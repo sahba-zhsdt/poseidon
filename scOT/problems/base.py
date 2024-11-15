@@ -111,9 +111,9 @@ def get_dataset(dataset, **kwargs):
         else:
             raise ValueError(f"Unknown dataset {dataset}")
         if "out" in dataset:
-            default_time_settings = {"max_num_time_steps": 10, "time_step_size": 2}
+            default_time_settings = {"max_num_time_steps": 30, "time_step_size": 2}
         else:
-            default_time_settings = {"max_num_time_steps": 150, "time_step_size": 2}
+            default_time_settings = {"max_num_time_steps": 7, "time_step_size": 2}
         if "tracer" in dataset:
             tracer = True
         else:
@@ -379,10 +379,18 @@ class TimeWrapper(BaseTimeDataset):
             dataset.which,
             dataset.num_trajectories,
             dataset.data_path,
-            None,
-            max_num_time_steps=1,
-            time_step_size=1,
+            fix_input_to_time_step=dataset.fix_input_to_time_step,
+            max_num_time_steps=dataset.max_num_time_steps,
+            time_step_size=dataset.time_step_size,
         )
+        # super().__init__(
+        #     dataset.which,
+        #     dataset.num_trajectories,
+        #     dataset.data_path,
+        #     None,
+        #     max_num_time_steps=1,
+        #     time_step_size=1,
+        # )
         self.dataset = dataset
         self.resolution = dataset.resolution
         self.input_dim = dataset.input_dim
