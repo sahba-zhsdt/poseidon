@@ -192,7 +192,7 @@ class RayleighTaylor(BaseTimeDataset):
 class CompressibleBase(BaseTimeDataset):
     def __init__(self, file_path, *args, tracer=False, **kwargs):
         super().__init__(*args, **kwargs)
-        assert self.max_num_time_steps * self.time_step_size <= 20
+        assert self.max_num_time_steps * self.time_step_size <= 200
 
         self.N_max = 3
         self.N_val = 1
@@ -241,19 +241,19 @@ class CompressibleBase(BaseTimeDataset):
         # inputs = (inputs - self.constants["mean"]) / self.constants["std"]
         # label = (label - self.constants["mean"]) / self.constants["std"]
 
-        if self.tracer:
-            input_tracer = (
-                torch.from_numpy(self.reader["data"][i + self.start, t1, 4:5])
-                .type(torch.float32)
-                .reshape(1, self.resolution, self.resolution)
-            )
-            output_tracer = (
-                torch.from_numpy(self.reader["data"][i + self.start, t2, 4:5])
-                .type(torch.float32)
-                .reshape(1, self.resolution, self.resolution)
-            )
-            inputs = torch.cat([inputs, input_tracer], dim=0)
-            label = torch.cat([label, output_tracer], dim=0)
+        # if self.tracer:
+        #     input_tracer = (
+        #         torch.from_numpy(self.reader["data"][i + self.start, t1, 4:5])
+        #         .type(torch.float32)
+        #         .reshape(1, self.resolution, self.resolution)
+        #     )
+        #     output_tracer = (
+        #         torch.from_numpy(self.reader["data"][i + self.start, t2, 4:5])
+        #         .type(torch.float32)
+        #         .reshape(1, self.resolution, self.resolution)
+        #     )
+        #     inputs = torch.cat([inputs, input_tracer], dim=0)
+        #     label = torch.cat([label, output_tracer], dim=0)
 
         return {
             "pixel_values": inputs,
@@ -311,10 +311,6 @@ class RiemannKelvinHelmholtz(CompressibleBase):
         
 class Bubble(CompressibleBase):
     def __init__(self, *args, tracer=False, **kwargs):
-        # self.mean_pressure = 0.215
         self.mean_pressure = 0.0
         file_path = "/JXF.nc"
-        # file_path = "/CE-RP.nc"
-        if tracer:
-            raise NotImplementedError("Tracer not implemented for Bubble")
         super().__init__(file_path, *args, tracer=tracer, **kwargs)

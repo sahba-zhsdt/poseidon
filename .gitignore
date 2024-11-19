@@ -161,9 +161,9 @@ cython_debug/
 
 /data
 /ckpts
-/ckptsss
-/fluids-compressible-Bubble-time
-/fluids-compressible-Bubble-time-out
+/ckpts1
+/ckpts2
+/ckpts3
 /HF
 /python=3.10
 /wandb

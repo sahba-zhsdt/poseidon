@@ -233,6 +233,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class TrainingArguments(TrainingArguments_):
+    
     learning_rate_embedding_recovery: Optional[float] = field(
         default=None,
         metadata={
@@ -269,9 +270,7 @@ class TrainingArguments(TrainingArguments_):
         self = super().set_optimizer(*args, **kwargs)
         self.learning_rate_embedding_recovery = learning_rate_embedding_recovery
         self.learning_rate_time_embedding = learning_rate_time_embedding
-        return self
-
-
+        return self 
 class Trainer(Trainer_):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -279,6 +278,8 @@ class Trainer(Trainer_):
         self.output_all_steps = False
 
     def get_decay_parameter_names(self, model) -> List[str]:
+        # interesting! here it is clear that weights in each layer (other that NormLayers) are the 
+        # ones should be decayed ...
         ALL_LAYERNORM_LAYERS = [torch.nn.LayerNorm, LayerNorm, ConditionalLayerNorm]
         decay_parameters = get_parameter_names(model, ALL_LAYERNORM_LAYERS)
         decay_parameters = [name for name in decay_parameters if "bias" not in name]

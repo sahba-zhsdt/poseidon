@@ -16,7 +16,7 @@
             "name": "poseidon",
             "type": "debugpy",
             "request": "launch",
-            "program": "./scOT/train.py",
+            "program": "./scOT/train-sahba.py",
             "console": "integratedTerminal",
             "justMyCode": false,
             "args": [
@@ -27,7 +27,14 @@
                 "--checkpoint_path",
                 "./ckpts",
                 "--wandb_run_name",
-                "poseidon-test-ursell",
+                "poseidonB_ursell",
+                "--finetune_from",
+                "camlab-ethz/Poseidon-B",
+                "--max_num_train_time_steps",
+                "50",
+                "--train_time_step_size",
+                "1"
+
             ]
         },
         {
@@ -55,27 +62,27 @@
             "name": "poseidon-infer-bubble",
             "type": "debugpy",
             "request": "launch",
-            "program": "./scOT/inference.py",
+            "program": "./scOT/inference-sahba.py",
             "console": "integratedTerminal",
             "justMyCode": false,
             "args": [
                 "--model_path",
-                "./ckptsss/scOT/posiedon-test-ursell",
+                "./ckpts3/scOT/poseidonB_ursell",
                 "--ckpt_dir",
-                "./ckptsss",
+                "./ckpts3",
                 "--data_path",
                 "./data",
                 "--dataset",
-                "fluids.compressible.Bubble.time.out",
+                "fluids.compressible.Bubble",
                 "--mode",
                 "eval",
                 "--append_time",
                 "--batch_size",
                 "5",
                 "--initial_time",
-                "50",
+                "20",
                 "--final_time",
-                "55",
+                "50",
             ]
         }
     ]

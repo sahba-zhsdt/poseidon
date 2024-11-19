@@ -113,7 +113,7 @@ def get_dataset(dataset, **kwargs):
         if "out" in dataset:
             default_time_settings = {"max_num_time_steps": 30, "time_step_size": 2}
         else:
-            default_time_settings = {"max_num_time_steps": 7, "time_step_size": 2}
+            default_time_settings = {"max_num_time_steps": 50, "time_step_size": 1} # although it is useless!
         if "tracer" in dataset:
             tracer = True
         else:
@@ -402,4 +402,5 @@ class TimeWrapper(BaseTimeDataset):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        return {**self.dataset[idx], "time": 1.0}
+        # return {**self.dataset[idx], "time": 1.0}
+        return {**self.dataset[idx]}

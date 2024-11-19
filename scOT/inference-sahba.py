@@ -101,7 +101,8 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
         ax.set_yticks([])
     
     plt.suptitle(f"Prediction after {dt} time steps", fontsize=25)
-    plt.savefig("./newfiggrid2.png")
+    plt.savefig("./prediction.png")
+
 
 def get_trainer(
     model_path,
