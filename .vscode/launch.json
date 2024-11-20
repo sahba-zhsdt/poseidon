@@ -31,31 +31,11 @@
                 "--finetune_from",
                 "camlab-ethz/Poseidon-B",
                 "--max_num_train_time_steps",
-                "50",
+                "10",
                 "--train_time_step_size",
-                "1"
+                "2",
+                "--replace_embedding_recovery"
 
-            ]
-        },
-        {
-            "name": "poseidon-infer-Riemann",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "./scOT/inference.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "--model_path",
-                "camlab-ethz/Poseidon-B",
-                "--ckpt_dir",
-                "./ckpts",
-                "--data_path",
-                "./data",
-                "--dataset",
-                "fluids.compressible.Riemann.time",
-                "--mode",
-                "eval",
-                "--append_time",
             ]
         },
         {
@@ -67,9 +47,9 @@
             "justMyCode": false,
             "args": [
                 "--model_path",
-                "./ckpts3/scOT/poseidonB_ursell",
+                "./ckpts1/scOT/poseidonB_ursell",
                 "--ckpt_dir",
-                "./ckpts3",
+                "./ckpts1",
                 "--data_path",
                 "./data",
                 "--dataset",
@@ -78,11 +58,11 @@
                 "eval",
                 "--append_time",
                 "--batch_size",
-                "5",
+                "16",
                 "--initial_time",
-                "20",
+                "5",
                 "--final_time",
-                "50",
+                "10",
             ]
         }
     ]
