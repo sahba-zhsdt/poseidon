@@ -10,13 +10,13 @@ The script can be used in different modes:
 
 See the --help page for more information.
 """
-
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "6"
 import argparse
 import torch
 import numpy as np
 import random
 import psutil
-import os
 import pandas as pd
 import wandb
 from transformers.trainer_utils import EvalPrediction
@@ -662,7 +662,6 @@ if __name__ == "__main__":
                 **metrics,
             }
             data = [remove_underscore_dict(data)]
-            inputs = dataset[0]["pixel_values"]
         elif params.mode == "eval_sweep":
             api = wandb.Api()
             sweep = api.sweep(

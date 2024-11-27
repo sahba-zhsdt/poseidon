@@ -32,7 +32,7 @@ SEED = 0
 torch.manual_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 # accelerator = Accelerator()
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # device = accelerator.device
@@ -78,16 +78,16 @@ MODEL_MAP = {
 
 
 def create_predictions_plot(predictions, labels, wandb_prefix):
-    assert predictions.shape[0] >= 4
+    assert predictions.shape[0] >= 1
 
-    indices = random.sample(range(predictions.shape[0]), 4)
+    indices = random.sample(range(predictions.shape[0]), 1)
 
     predictions = predictions[indices]
     labels = labels[indices]
 
     fig = plt.figure()
     grid = ImageGrid(
-        fig, 111, nrows_ncols=(predictions.shape[1] + labels.shape[1], 4), axes_pad=0.1
+        fig, 111, nrows_ncols=(predictions.shape[1] + labels.shape[1], 1), axes_pad=0.1
     )
 
     vmax, vmin = max(predictions.max(), labels.max()), min(
@@ -95,8 +95,9 @@ def create_predictions_plot(predictions, labels, wandb_prefix):
     )
 
     for _i, ax in enumerate(grid):
-        i = _i // 4
-        j = _i % 4
+        i = _i // 1
+        # j = _i % 1
+        j=0
 
         if i % 2 == 0:
             ax.imshow(
@@ -118,7 +119,9 @@ def create_predictions_plot(predictions, labels, wandb_prefix):
         ax.set_xticks([])
         ax.set_yticks([])
 
+    plt.savefig("./theirpred.png")
     wandb.log({wandb_prefix + "/predictions": wandb.Image(fig)})
+    
     plt.close()
 
 
@@ -306,7 +309,7 @@ if __name__ == "__main__":
         adam_epsilon=1e-8,  # default
         lr_scheduler_type=config["lr_scheduler"],
         warmup_ratio=config["warmup_ratio"],
-        log_level="passive",
+        log_level="info",
         logging_strategy="steps",
         logging_steps=5,
         logging_nan_inf_filter=False,
@@ -415,6 +418,7 @@ if __name__ == "__main__":
 
     trainer.train(resume_from_checkpoint=params.resume_training)
     trainer.save_model(train_config.output_dir)
+    
     
     if (RANK == 0 or RANK == -1) and params.push_to_hf_hub is not None:
         model.push_to_hub(params.push_to_hf_hub)
@@ -542,3 +546,4 @@ if __name__ == "__main__":
                         predictions.label_ids,
                         wandb_prefix="test_out_dist/ar",
                     )
+

@@ -149,7 +149,12 @@ class ConditionalLayerNorm(nn.Module):
 
     def forward(self, x, time):
         mean = x.mean(dim=-1, keepdim=True)
-        var = (x**2).mean(dim=-1, keepdim=True) - mean**2
+        has_nan1 = torch.isnan(mean).any()
+        has_nan2 = torch.isnan(x).any()
+        a= (x**2).mean(dim=-1, keepdim=True)
+        b = mean**2
+        var = a -b
+        # var = (x**2).mean(dim=-1, keepdim=True) - mean**2
         x = (x - mean) / (var + self.eps).sqrt()
         time = time.reshape(-1, 1).type_as(x)
         weight = self.weight(time).unsqueeze(1)
@@ -1344,6 +1349,15 @@ class ScOT(Swinv2PreTrainedModel):
         embedding_output, input_dimensions = self.embeddings(
             pixel_values, bool_masked_pos=bool_masked_pos, time=time
         )
+        
+        import numpy as np
+        # np.save('CE-RP.npy', embedding_output.detach().cpu().numpy())
+        # np.save('CE-CRP.npy', embedding_output.detach().cpu().numpy())
+        # np.save('CE-KH.npy', embedding_output.detach().cpu().numpy())
+        # np.save('CE-Gauss.npy', embedding_output.detach().cpu().numpy())
+        np.save('NS-Sines.npy', embedding_output.detach().cpu().numpy())
+        # np.save('NS-Gauss.npy', embedding_output.detach().cpu().numpy())
+        # np.save('JXF.npy', embedding_output.detach().cpu().numpy())
 
         encoder_outputs = self.encoder(
             embedding_output,

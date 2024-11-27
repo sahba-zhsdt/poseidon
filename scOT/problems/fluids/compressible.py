@@ -194,10 +194,10 @@ class CompressibleBase(BaseTimeDataset):
         super().__init__(*args, **kwargs)
         assert self.max_num_time_steps * self.time_step_size <= 200
 
-        self.N_max = 3
-        self.N_val = 1
-        self.N_test = 1
-        self.resolution = 352 # here will be 352 in new data
+        self.N_max = 20000
+        self.N_val = 120
+        self.N_test = 240
+        self.resolution = 128 # here will be 352 in new data
         self.tracer = tracer
 
         data_path = self.data_path + file_path
@@ -207,6 +207,16 @@ class CompressibleBase(BaseTimeDataset):
 
         self.constants = copy.deepcopy(CONSTANTS)
 
+        # self.input_dim = 1
+        # self.label_description = (
+        #     "[p]"
+        # )
+
+        # self.pixel_mask = (
+        #     torch.tensor([False])
+        # )
+        
+        
         self.input_dim = 4 if not tracer else 5
         self.label_description = (
             "[rho],[u,v],[p]" if not tracer else "[rho],[u,v],[p],[tracer]"
@@ -234,26 +244,37 @@ class CompressibleBase(BaseTimeDataset):
             .type(torch.float32)
             .reshape(4, self.resolution, self.resolution)
         )
+        
+        # inputs = (
+        #     torch.from_numpy(self.reader["data"][i + self.start, t1, 0:1])
+        #     .type(torch.float32)
+        #     .reshape(1, self.resolution, self.resolution)
+        # )
+        # label = (
+        #     torch.from_numpy(self.reader["data"][i + self.start, t2, 0:1])
+        #     .type(torch.float32)
+        #     .reshape(1, self.resolution, self.resolution)
+        # )
 
-        # inputs[3] = inputs[3] - self.mean_pressure
-        # label[3] = label[3] - self.mean_pressure
+        inputs[3] = inputs[3] - self.mean_pressure
+        label[3] = label[3] - self.mean_pressure
 
-        # inputs = (inputs - self.constants["mean"]) / self.constants["std"]
-        # label = (label - self.constants["mean"]) / self.constants["std"]
+        inputs = (inputs - self.constants["mean"]) / self.constants["std"]
+        label = (label - self.constants["mean"]) / self.constants["std"]
 
-        # if self.tracer:
-        #     input_tracer = (
-        #         torch.from_numpy(self.reader["data"][i + self.start, t1, 4:5])
-        #         .type(torch.float32)
-        #         .reshape(1, self.resolution, self.resolution)
-        #     )
-        #     output_tracer = (
-        #         torch.from_numpy(self.reader["data"][i + self.start, t2, 4:5])
-        #         .type(torch.float32)
-        #         .reshape(1, self.resolution, self.resolution)
-        #     )
-        #     inputs = torch.cat([inputs, input_tracer], dim=0)
-        #     label = torch.cat([label, output_tracer], dim=0)
+        if self.tracer:
+            input_tracer = (
+                torch.from_numpy(self.reader["data"][i + self.start, t1, 4:5])
+                .type(torch.float32)
+                .reshape(1, self.resolution, self.resolution)
+            )
+            output_tracer = (
+                torch.from_numpy(self.reader["data"][i + self.start, t2, 4:5])
+                .type(torch.float32)
+                .reshape(1, self.resolution, self.resolution)
+            )
+            inputs = torch.cat([inputs, input_tracer], dim=0)
+            label = torch.cat([label, output_tracer], dim=0)
 
         return {
             "pixel_values": inputs,
@@ -313,4 +334,5 @@ class Bubble(CompressibleBase):
     def __init__(self, *args, tracer=False, **kwargs):
         self.mean_pressure = 0.0
         file_path = "/JXF.nc"
+        # file_path = "/JXF_onlyP.nc"
         super().__init__(file_path, *args, tracer=tracer, **kwargs)

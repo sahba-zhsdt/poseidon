@@ -161,9 +161,8 @@ cython_debug/
 
 /data
 /ckpts
-/ckpts1
-/ckpts2
-/ckpts3
+/ckpts_L
+/ckpts-latentfrozen
 /HF
 /python=3.10
 /wandb

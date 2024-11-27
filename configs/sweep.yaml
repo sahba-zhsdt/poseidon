@@ -19,7 +19,13 @@ command:
   - ${args_json}
 parameters:
   dataset:
-    value: "wave.Layer"
+    values: 
+      - "fluids.compressible.Riemann"
+      - "fluids.compressible.RiemannCurved"
+      - "fluids.compressible.KelvinHelmholtz"
+      - "fluids.compressible.Gaussians"
+      - "fluids.incompressible.Sines"
+      - "fluids.incompressible.Gaussians"
   num_trajectories:
     values:
       - 1

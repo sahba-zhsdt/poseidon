@@ -112,6 +112,7 @@ In the code, we refer to the datasets by a different identifier than on the 🤗
 |fluids.compressible.steady.Airfoil(.time)|SE-AF|
 |elliptic.poisson.Gaussians(.time)|Poisson-Gauss|
 |elliptic.Helmholtz(.time)|Helmholtz|
+|fluids.compressible.Bubble|>> mine
 
 Adding the suffix `.time` to the dataset identifier will load the dataset as time-dependent dataset, i.e. as a long-time limit – use that suffix for finetuning on time-independent datasets.
 

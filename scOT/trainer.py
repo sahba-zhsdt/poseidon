@@ -314,13 +314,13 @@ class Trainer(Trainer_):
                             params["embeddings"].append(p)
                         elif n in decay_parameters and p.requires_grad:
                             params["standard"].append(p)
-                            p.requires_grad=False
+                            # p.requires_grad=False
                         elif p.requires_grad:
                             if n in time_embedding_params:
                                 params["time_embedding"].append(p)
                             else:
                                 params["no_weight_decay"].append(p)
-                                p.requires_grad=False
+                                # p.requires_grad=False
                     optimizer_grouped_parameters = [
                         {
                             "params": params["standard"],
@@ -457,9 +457,9 @@ class Trainer(Trainer_):
         temp = hasattr(model, 'config')
         temp2 = hasattr(self, 'ar_steps')
         st = self.ar_steps
-        if self.ar_steps is not None and hasattr(model.module, 'config') and model.module.config.use_conditioning:
+        if self.ar_steps is not None and hasattr(model, 'config') and model.config.use_conditioning:
             channel_difference = (
-                model.module.config.num_channels > model.module.config.num_out_channels
+                model.config.num_channels > model.config.num_out_channels
             )
             # TODO: if outputs is not a dataclass this will break
             if isinstance(self.ar_steps, int):

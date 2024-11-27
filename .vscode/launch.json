@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "tSNE",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./scOT/tSNE.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "samples",
             "type": "debugpy",
             "request": "launch",
@@ -16,7 +23,25 @@
             "name": "poseidon",
             "type": "debugpy",
             "request": "launch",
-            "program": "./scOT/train-sahba.py",
+            "program": "./scOT/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--config",
+                "./configs/run1.yaml",
+                "--data_path",
+                "./data",
+                "--checkpoint_path",
+                "./ckpts_L",
+                "--wandb_run_name",
+                "poseidonL_plot"
+            ]
+        },
+        {
+            "name": "poseidon_main",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./scOT/train.py",
             "console": "integratedTerminal",
             "justMyCode": false,
             "args": [
@@ -27,15 +52,9 @@
                 "--checkpoint_path",
                 "./ckpts",
                 "--wandb_run_name",
-                "poseidonB_ursell",
+                "poseidonB_tSNE",
                 "--finetune_from",
-                "camlab-ethz/Poseidon-B",
-                "--max_num_train_time_steps",
-                "10",
-                "--train_time_step_size",
-                "2",
-                "--replace_embedding_recovery"
-
+                "camlab-ethz/Poseidon-B"
             ]
         },
         {
@@ -47,9 +66,9 @@
             "justMyCode": false,
             "args": [
                 "--model_path",
-                "./ckpts1/scOT/poseidonB_ursell",
+                "./ckpts_L/scOT/poseidonL",
                 "--ckpt_dir",
-                "./ckpts1",
+                "./ckpts_L",
                 "--data_path",
                 "./data",
                 "--dataset",
@@ -58,11 +77,32 @@
                 "eval",
                 "--append_time",
                 "--batch_size",
-                "16",
+                "8",
                 "--initial_time",
-                "5",
+                "23",
                 "--final_time",
-                "10",
+                "24",
+            ]
+        },
+        {
+            "name": "poseidon-infer",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./scOT/inference.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--model_path",
+                "./ckpts_L/scOT/poseidonL",
+                "--ckpt_dir",
+                "./ckpts_L",
+                "--data_path",
+                "./data",
+                "--dataset",
+                "fluids.incompressible.Sines",
+                "--mode",
+                "eval",
+                "--append_time"
             ]
         }
     ]

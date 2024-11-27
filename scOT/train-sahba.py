@@ -14,7 +14,7 @@ import psutil
 import os
 
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
-os.environ["CUDA_VISIBLE_DEVICES"] = "7"
+os.environ["CUDA_VISIBLE_DEVICES"] = "4,5"
 import yaml
 import matplotlib.pyplot as plt
 import transformers
