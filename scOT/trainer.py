@@ -233,6 +233,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class TrainingArguments(TrainingArguments_):
+    
     learning_rate_embedding_recovery: Optional[float] = field(
         default=None,
         metadata={
@@ -269,9 +270,7 @@ class TrainingArguments(TrainingArguments_):
         self = super().set_optimizer(*args, **kwargs)
         self.learning_rate_embedding_recovery = learning_rate_embedding_recovery
         self.learning_rate_time_embedding = learning_rate_time_embedding
-        return self
-
-
+        return self 
 class Trainer(Trainer_):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -279,6 +278,8 @@ class Trainer(Trainer_):
         self.output_all_steps = False
 
     def get_decay_parameter_names(self, model) -> List[str]:
+        # interesting! here it is clear that weights in each layer (other that NormLayers) are the 
+        # ones should be decayed ...
         ALL_LAYERNORM_LAYERS = [torch.nn.LayerNorm, LayerNorm, ConditionalLayerNorm]
         decay_parameters = get_parameter_names(model, ALL_LAYERNORM_LAYERS)
         decay_parameters = [name for name in decay_parameters if "bias" not in name]
@@ -313,11 +314,13 @@ class Trainer(Trainer_):
                             params["embeddings"].append(p)
                         elif n in decay_parameters and p.requires_grad:
                             params["standard"].append(p)
+                            p.requires_grad=False
                         elif p.requires_grad:
                             if n in time_embedding_params:
                                 params["time_embedding"].append(p)
                             else:
                                 params["no_weight_decay"].append(p)
+                                p.requires_grad=False
                     optimizer_grouped_parameters = [
                         {
                             "params": params["standard"],
@@ -450,7 +453,11 @@ class Trainer(Trainer_):
             self.output_all_steps = True
 
     def _model_forward(self, model, inputs):
-        if self.ar_steps is not None and model.config.use_conditioning:
+        
+        temp = hasattr(model, 'config')
+        temp2 = hasattr(self, 'ar_steps')
+        st = self.ar_steps
+        if self.ar_steps is not None and hasattr(model, 'config') and model.config.use_conditioning:
             channel_difference = (
                 model.config.num_channels > model.config.num_out_channels
             )
@@ -687,6 +694,19 @@ class Trainer(Trainer_):
                 )
             else:
                 ignore_keys = []
+                
+        # # label control
+        # import matplotlib.pyplot as plt
+        # plt.figure(figsize=(10, 10))
+        # for t in range(10):
+        #     # t+=50
+        #     plt.contourf(inputs["labels"][t,3,:,:].cpu().numpy().T)
+        #     plt.title("vy real")
+        #     plt.xlabel("X-axis")
+        #     plt.ylabel("Y-axis")
+        #     plt.savefig("./velyveri.png")
+        
+        # ###
 
         # labels may be popped when computing the loss (label smoothing for instance) so we grab them first.
         if has_labels or loss_without_labels:

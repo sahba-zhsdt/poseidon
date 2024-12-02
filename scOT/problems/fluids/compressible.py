@@ -3,7 +3,7 @@ import h5py
 import copy
 from scOT.problems.base import BaseTimeDataset, BaseDataset
 from scOT.problems.fluids.normalization_constants import CONSTANTS
-from jaxfluids_postprocess import load_data
+# from jaxfluids_postprocess import load_data
 
 
 class Airfoil(BaseDataset):
@@ -192,12 +192,12 @@ class RayleighTaylor(BaseTimeDataset):
 class CompressibleBase(BaseTimeDataset):
     def __init__(self, file_path, *args, tracer=False, **kwargs):
         super().__init__(*args, **kwargs)
-        assert self.max_num_time_steps * self.time_step_size <= 300
+        assert self.max_num_time_steps * self.time_step_size <= 200
 
         self.N_max = 3
         self.N_val = 1
         self.N_test = 1
-        self.resolution = 352 # here will be 352 in new data
+        self.resolution = 128 # here will be 352 in new data
         self.tracer = tracer
 
         data_path = self.data_path + file_path
@@ -207,6 +207,16 @@ class CompressibleBase(BaseTimeDataset):
 
         self.constants = copy.deepcopy(CONSTANTS)
 
+        # self.input_dim = 1
+        # self.label_description = (
+        #     "[p]"
+        # )
+
+        # self.pixel_mask = (
+        #     torch.tensor([False])
+        # )
+        
+        
         self.input_dim = 4 if not tracer else 5
         self.label_description = (
             "[rho],[u,v],[p]" if not tracer else "[rho],[u,v],[p],[tracer]"
@@ -234,6 +244,17 @@ class CompressibleBase(BaseTimeDataset):
             .type(torch.float32)
             .reshape(4, self.resolution, self.resolution)
         )
+        
+        # inputs = (
+        #     torch.from_numpy(self.reader["data"][i + self.start, t1, 0:1])
+        #     .type(torch.float32)
+        #     .reshape(1, self.resolution, self.resolution)
+        # )
+        # label = (
+        #     torch.from_numpy(self.reader["data"][i + self.start, t2, 0:1])
+        #     .type(torch.float32)
+        #     .reshape(1, self.resolution, self.resolution)
+        # )
 
         # inputs[3] = inputs[3] - self.mean_pressure
         # label[3] = label[3] - self.mean_pressure
@@ -311,10 +332,5 @@ class RiemannKelvinHelmholtz(CompressibleBase):
         
 class Bubble(CompressibleBase):
     def __init__(self, *args, tracer=False, **kwargs):
-        # self.mean_pressure = 0.215
-        self.mean_pressure = 0.0
-        file_path = "/JXF.nc"
-        # file_path = "/CE-RP.nc"
-        if tracer:
-            raise NotImplementedError("Tracer not implemented for Bubble")
+        file_path = "/JXF_ND.nc"
         super().__init__(file_path, *args, tracer=tracer, **kwargs)

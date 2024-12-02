@@ -10,27 +10,99 @@ The script can be used in different modes:
 
 See the --help page for more information.
 """
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "7"
+
 import argparse
 import torch
 import numpy as np
 import random
 import psutil
+import os
 import pandas as pd
 import wandb
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import ImageGrid
 from transformers.trainer_utils import EvalPrediction
 from scOT.model import ScOT
 from scOT.trainer import TrainingArguments, Trainer
 from scOT.problems.base import get_dataset, BaseTimeDataset
 from scOT.metrics import relative_lp_error, lp_error
-from scOT.train import create_predictions_plot
 
 
 SEED = 0
 torch.manual_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
+
+def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
+    # assert predictions.shape[0] >= 4
+
+    indices = random.sample(range(predictions.shape[0]), 1)
+    predictions = predictions[indices]
+    labels = labels[indices]
+    inputs = inputs[None, :,:,:]
+    
+    i_time = kwargs['initial_time']
+    o_time = kwargs['final_time']
+    dt = o_time - i_time
+
+    fig = plt.figure(figsize=(40, 35))
+    grid = ImageGrid(
+        fig, 111, nrows_ncols=(predictions.shape[1], 3), axes_pad=0.5, 
+        cbar_mode="each", cbar_pad=0.2, cbar_size="4%", cbar_location="right",
+        share_all=True
+    )
+    
+    # for-loop to get the correct [vmax, vmin] for each channel
+    vmax=[]
+    vmin=[]
+    for i in range(predictions.shape[1]):
+        vmax.append(max(predictions[:,i,:,:].max(), labels[:,i,:,:].max(), inputs[:,i,:,:].max()))
+        vmin.append(min(predictions[:,i,:,:].min(), labels[:,i,:,:].min(), inputs[:,i,:,:].min()))
+    
+    
+    for _i, ax in enumerate(grid):
+        i = _i // 1 #num of sample
+        j = _i % 1  #num of sample
+
+        if _i % 3 == 0:
+            im = ax.imshow(
+                inputs[j, i // 3].T,
+                cmap="gist_ncar",
+                origin="lower",
+                vmin=vmin[i//3],
+                vmax=vmax[i//3],
+            )
+            ax.set_title(f"Initial State channel {i//3} @ time step {i_time}")
+            cbar = grid.cbar_axes[_i].colorbar(im)
+            
+        elif _i % 3 == 1:
+            im = ax.imshow(
+                labels[j, i // 3].T,
+                cmap="gist_ncar",
+                origin="lower",
+                vmin=vmin[i//3],
+                vmax=vmax[i//3],
+            )
+            ax.set_title(f"Ground Truth channel {i//3} @ time step {o_time}")
+            cbar = grid.cbar_axes[_i].colorbar(im)
+            
+        else:
+            im = ax.imshow(
+                predictions[j, i // 3].T,
+                cmap="gist_ncar",
+                origin="lower",
+                vmin=vmin[i//3],
+                vmax=vmax[i//3],
+            )
+            ax.set_title(f"Predicted channel {i//3} @ time step {o_time}")
+            cbar = grid.cbar_axes[_i].colorbar(im)
+
+        ax.set_xticks([])
+        ax.set_yticks([])
+    
+    plt.suptitle(f"Prediction after {dt} time steps", fontsize=25)
+    plt.savefig("./predictionB.png")
+
 
 
 def get_trainer(
@@ -404,11 +476,17 @@ if __name__ == "__main__":
         default=None,
         help="Final time step to end at.",
     )
+    # parser.add_argument(
+    #     "--ar_steps",
+    #     type=int,
+    #     nargs="+",
+    #     default=None,
+    #     help="Number of autoregressive steps to take. A single int n is interpreted as taking n homogeneous steps, a list of ints [j_0, j_1, ...] is interpreted as taking a step of size j_i.",
+    # )
     parser.add_argument(
         "--ar_steps",
         type=int,
-        nargs="+",
-        default=[1],
+        default=None,
         help="Number of autoregressive steps to take. A single int n is interpreted as taking n homogeneous steps, a list of ints [j_0, j_1, ...] is interpreted as taking a step of size j_i.",
     )
     parser.add_argument(
@@ -498,14 +576,17 @@ if __name__ == "__main__":
     )
     params = parser.parse_args()
     
-    if len(params.ar_steps) == 1:
+    if params.ar_steps is not None and len(params.ar_steps) == 1:
         params.ar_steps = params.ar_steps[0]
         ar_steps = params.ar_steps
-    else:
+    elif params.ar_steps is not None and len(params.ar_steps) != 1:
         ar_steps = params.ar_steps
         params.ar_steps = [
             step / (params.final_time - params.initial_time) for step in params.ar_steps
         ]
+    else:
+        ar_steps = params.ar_steps
+       
     dataset_kwargs = {}
     if params.just_velocities:
         dataset_kwargs["just_velocities"] = True
@@ -661,7 +742,8 @@ if __name__ == "__main__":
                 "ar_steps": ar_steps,
                 **metrics,
             }
-            data = [remove_underscore_dict(data)]
+            # data = [remove_underscore_dict(data)]
+            inputs = dataset[0]["pixel_values"]
         elif params.mode == "eval_sweep":
             api = wandb.Api()
             sweep = api.sweep(
@@ -965,13 +1047,22 @@ if __name__ == "__main__":
                     )
                 )
 
-        
-        if os.path.exists(params.file):
-            df = pd.read_csv(params.file)
-        else:
-            df = pd.DataFrame()
-        df = pd.concat([df, pd.DataFrame(data)], ignore_index=True)
-        df.to_csv(params.file, index=False)
+    # some other operation with data should be done here!
+    
+    print("Inference is on ...")
+    RANK = int(os.environ.get("LOCAL_RANK", -1))
+    if RANK == 0 or RANK == -1:
+        metrics = {}
+        for key, value in metrics.items():
+             metrics["test/" + key[1:]] = value
+      
+        # wandb.log(metrics)
+        create_predictions_plot_infer(
+            inputs,
+            predictions,
+            label_ids,
+            **data
+        )
 
 
 exit()

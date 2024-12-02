@@ -3,8 +3,7 @@ This script trains a scOT or pretrains Poseidon on a PDE dataset.
 Can be also used for finetuning Poseidon.
 Can be used in a single config or sweep setup.
 """
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "7,6,5,4"
+
 import argparse
 import torch
 import wandb
@@ -12,15 +11,15 @@ import numpy as np
 import random
 import json
 import psutil
-
+import os
 
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
-# temp = os.environ.get("ACCELERATE_USE_FSDP", "false")
+os.environ["CUDA_VISIBLE_DEVICES"] = "4,5"
 import yaml
 import matplotlib.pyplot as plt
 import transformers
 from accelerate.utils import broadcast_object_list
-from accelerate import Accelerator
+
 from scOT.trainer import TrainingArguments, Trainer
 from transformers import EarlyStoppingCallback
 from scOT.model import ScOT, ScOTConfig
@@ -33,6 +32,7 @@ SEED = 0
 torch.manual_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
+
 
 MODEL_MAP = {
     "T": {
@@ -115,9 +115,7 @@ def create_predictions_plot(predictions, labels, wandb_prefix):
         ax.set_xticks([])
         ax.set_yticks([])
 
-    plt.savefig("./pred.png")
     wandb.log({wandb_prefix + "/predictions": wandb.Image(fig)})
-    
     plt.close()
 
 
@@ -281,6 +279,7 @@ if __name__ == "__main__":
     train_config = TrainingArguments(
         output_dir=ckpt_dir,
         overwrite_output_dir=True,  #! OVERWRITE THIS DIRECTORY IN CASE, also for resuming training
+        do_train=True,
         evaluation_strategy="epoch",
         per_device_train_batch_size=config["batch_size"],
         per_device_eval_batch_size=config["batch_size"],
@@ -306,7 +305,6 @@ if __name__ == "__main__":
         lr_scheduler_type=config["lr_scheduler"],
         warmup_ratio=config["warmup_ratio"],
         log_level="info",
-        logging_strategy="steps",
         logging_steps=5,
         logging_nan_inf_filter=False,
         save_strategy="epoch",
@@ -348,6 +346,8 @@ if __name__ == "__main__":
         print(f"Model size without embeddings: {num_params_no_embed}")
 
     def compute_metrics(eval_preds):
+        # I need new relevant metrica to be added to the list. Some physical-related metrics ...
+        # check pde-bench metrics. 
         channel_list = channel_slice_list
 
         def get_statistics(errors):
@@ -405,7 +405,6 @@ if __name__ == "__main__":
 
     trainer = Trainer(
         model=model,
-        # model=ScOT.from_pretrained("./ckpts/scOT/poseidonB_lf_onlyP/checkpoint-644"),
         args=train_config,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
@@ -416,10 +415,10 @@ if __name__ == "__main__":
     trainer.train(resume_from_checkpoint=params.resume_training)
     trainer.save_model(train_config.output_dir)
     
-    
     if (RANK == 0 or RANK == -1) and params.push_to_hf_hub is not None:
         model.push_to_hub(params.push_to_hf_hub)
 
+    exit()
     do_test = (
         True
         if params.max_num_train_time_steps is None
@@ -543,4 +542,3 @@ if __name__ == "__main__":
                         predictions.label_ids,
                         wandb_prefix="test_out_dist/ar",
                     )
-

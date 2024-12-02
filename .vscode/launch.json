@@ -1,0 +1,92 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "tSNE",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./scOT/tSNE.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "samples",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./samples.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "poseidon",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./scOT/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--config",
+                "./configs/run.yaml",
+                "--data_path",
+                "./data",
+                "--checkpoint_path",
+                "./ckpts",
+                "--wandb_run_name",
+                "poseidonB_lf_normdata",
+                "--finetune_from",
+                "camlab-ethz/Poseidon-B",
+                "--replace_embedding_recovery"
+            ]
+        },
+        {
+            "name": "poseidon-infer-bubble",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./scOT/inference-sahba.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--model_path",
+                "./ckpts/scOT/poseidonB",
+                "--ckpt_dir",
+                "./ckpts",
+                "--data_path",
+                "./data",
+                "--dataset",
+                "fluids.compressible.Bubble",
+                "--mode",
+                "eval",
+                "--append_time",
+                "--batch_size",
+                "8",
+                "--initial_time",
+                "23",
+                "--final_time",
+                "50",
+            ]
+        },
+        {
+            "name": "poseidon-infer",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./scOT/inference.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--model_path",
+                "./ckpts_L/scOT/poseidonL",
+                "--ckpt_dir",
+                "./ckpts_L",
+                "--data_path",
+                "./data",
+                "--dataset",
+                "fluids.incompressible.Sines",
+                "--mode",
+                "eval",
+                "--append_time"
+            ]
+        }
+    ]
+}
