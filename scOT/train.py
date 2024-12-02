@@ -30,7 +30,7 @@ SEED = 0
 torch.manual_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 MODEL_MAP = {
     "T": {
@@ -333,6 +333,8 @@ if __name__ == "__main__":
         )
     else:
         model = ScOT(model_config)
+        
+    model.to(device)
     num_params = get_num_parameters(model)
     config["num_params"] = num_params
     num_params_no_embed = get_num_parameters_no_embed(model)
