@@ -3,7 +3,8 @@ This script trains a scOT or pretrains Poseidon on a PDE dataset.
 Can be also used for finetuning Poseidon.
 Can be used in a single config or sweep setup.
 """
-
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "7,6,5,4"
 import argparse
 import torch
 import wandb
@@ -11,7 +12,7 @@ import numpy as np
 import random
 import json
 import psutil
-import os
+
 
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 # temp = os.environ.get("ACCELERATE_USE_FSDP", "false")
@@ -32,10 +33,6 @@ SEED = 0
 torch.manual_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
-# accelerator = Accelerator()
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# device = accelerator.device
 
 MODEL_MAP = {
     "T": {
@@ -78,16 +75,16 @@ MODEL_MAP = {
 
 
 def create_predictions_plot(predictions, labels, wandb_prefix):
-    assert predictions.shape[0] >= 1
+    assert predictions.shape[0] >= 4
 
-    indices = random.sample(range(predictions.shape[0]), 1)
+    indices = random.sample(range(predictions.shape[0]), 4)
 
     predictions = predictions[indices]
     labels = labels[indices]
 
     fig = plt.figure()
     grid = ImageGrid(
-        fig, 111, nrows_ncols=(predictions.shape[1] + labels.shape[1], 1), axes_pad=0.1
+        fig, 111, nrows_ncols=(predictions.shape[1] + labels.shape[1], 4), axes_pad=0.1
     )
 
     vmax, vmin = max(predictions.max(), labels.max()), min(
@@ -95,9 +92,8 @@ def create_predictions_plot(predictions, labels, wandb_prefix):
     )
 
     for _i, ax in enumerate(grid):
-        i = _i // 1
-        # j = _i % 1
-        j=0
+        i = _i // 4
+        j = _i % 4
 
         if i % 2 == 0:
             ax.imshow(
@@ -119,7 +115,7 @@ def create_predictions_plot(predictions, labels, wandb_prefix):
         ax.set_xticks([])
         ax.set_yticks([])
 
-    plt.savefig("./theirpred.png")
+    plt.savefig("./pred.png")
     wandb.log({wandb_prefix + "/predictions": wandb.Image(fig)})
     
     plt.close()
@@ -409,6 +405,7 @@ if __name__ == "__main__":
 
     trainer = Trainer(
         model=model,
+        # model=ScOT.from_pretrained("./ckpts/scOT/poseidonB_lf_onlyP/checkpoint-644"),
         args=train_config,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,

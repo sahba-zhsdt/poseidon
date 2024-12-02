@@ -66,7 +66,7 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
 
         if _i % 3 == 0:
             im = ax.imshow(
-                inputs[j, i // 3, :152, 100:252].T,
+                inputs[j, i // 3].T,
                 cmap="gist_ncar",
                 origin="lower",
                 vmin=vmin[i//3],
@@ -77,7 +77,7 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
             
         elif _i % 3 == 1:
             im = ax.imshow(
-                labels[j, i // 3, :152, 100:252].T,
+                labels[j, i // 3].T,
                 cmap="gist_ncar",
                 origin="lower",
                 vmin=vmin[i//3],
@@ -88,7 +88,7 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
             
         else:
             im = ax.imshow(
-                predictions[j, i // 3, :152, 100:252].T,
+                predictions[j, i // 3].T,
                 cmap="gist_ncar",
                 origin="lower",
                 vmin=vmin[i//3],
@@ -101,78 +101,8 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
         ax.set_yticks([])
     
     plt.suptitle(f"Prediction after {dt} time steps", fontsize=25)
-    plt.savefig("./predictionL.png")
-    
+    plt.savefig("./predictionB.png")
 
-def create_predictions_plot_infer_multi(inputs, predictions, labels, **kwargs):
-    # assert predictions.shape[0] >= 4
-
-    indices = random.sample(range(predictions.shape[0]), 4)
-    predictions = predictions[indices]
-    labels = labels[indices]
-    # inputs = inputs[None, :,:,:]
-    
-    # i_time = kwargs['initial_time']
-    # o_time = kwargs['final_time']
-    # dt = o_time - i_time
-
-    fig = plt.figure(figsize=(40, 35))
-    grid = ImageGrid(
-        fig, 111, nrows_ncols=(predictions.shape[1], 3), axes_pad=0.5, 
-        cbar_mode="each", cbar_pad=0.2, cbar_size="4%", cbar_location="right",
-        share_all=True
-    )
-    
-    # for-loop to get the correct [vmax, vmin] for each channel
-    vmax=[]
-    vmin=[]
-    for i in range(predictions.shape[1]):
-        vmax.append(max(predictions[:,i,:,:].max(), labels[:,i,:,:].max(), inputs[:,i,:,:].max()))
-        vmin.append(min(predictions[:,i,:,:].min(), labels[:,i,:,:].min(), inputs[:,i,:,:].min()))
-    
-    
-    for _i, ax in enumerate(grid):
-        i = _i // 1 #num of sample
-        j = _i % 1  #num of sample
-
-        if _i % 3 == 0:
-            im = ax.imshow(
-                inputs[j, i // 3, :152, 100:252].T,
-                cmap="gist_ncar",
-                origin="lower",
-                vmin=vmin[i//3],
-                vmax=vmax[i//3],
-            )
-            ax.set_title(f"Initial State channel {i//3} @ time step {i_time}")
-            cbar = grid.cbar_axes[_i].colorbar(im)
-            
-        elif _i % 3 == 1:
-            im = ax.imshow(
-                labels[j, i // 3, :152, 100:252].T,
-                cmap="gist_ncar",
-                origin="lower",
-                vmin=vmin[i//3],
-                vmax=vmax[i//3],
-            )
-            ax.set_title(f"Ground Truth channel {i//3} @ time step {o_time}")
-            cbar = grid.cbar_axes[_i].colorbar(im)
-            
-        else:
-            im = ax.imshow(
-                predictions[j, i // 3, :152, 100:252].T,
-                cmap="gist_ncar",
-                origin="lower",
-                vmin=vmin[i//3],
-                vmax=vmax[i//3],
-            )
-            ax.set_title(f"Predicted channel {i//3} @ time step {o_time}")
-            cbar = grid.cbar_axes[_i].colorbar(im)
-
-        ax.set_xticks([])
-        ax.set_yticks([])
-    
-    plt.suptitle(f"Prediction after {dt} time steps", fontsize=25)
-    plt.savefig("./prediction.png")
 
 
 def get_trainer(

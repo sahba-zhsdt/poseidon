@@ -28,33 +28,16 @@
             "justMyCode": false,
             "args": [
                 "--config",
-                "./configs/run1.yaml",
-                "--data_path",
-                "./data",
-                "--checkpoint_path",
-                "./ckpts_L",
-                "--wandb_run_name",
-                "poseidonL_plot"
-            ]
-        },
-        {
-            "name": "poseidon_main",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "./scOT/train.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "--config",
                 "./configs/run.yaml",
                 "--data_path",
                 "./data",
                 "--checkpoint_path",
                 "./ckpts",
                 "--wandb_run_name",
-                "poseidonB_tSNE",
+                "poseidonB_lf_normdata",
                 "--finetune_from",
-                "camlab-ethz/Poseidon-B"
+                "camlab-ethz/Poseidon-B",
+                "--replace_embedding_recovery"
             ]
         },
         {
@@ -66,9 +49,9 @@
             "justMyCode": false,
             "args": [
                 "--model_path",
-                "./ckpts_L/scOT/poseidonL",
+                "./ckpts/scOT/poseidonB",
                 "--ckpt_dir",
-                "./ckpts_L",
+                "./ckpts",
                 "--data_path",
                 "./data",
                 "--dataset",
@@ -81,7 +64,7 @@
                 "--initial_time",
                 "23",
                 "--final_time",
-                "24",
+                "50",
             ]
         },
         {

@@ -113,7 +113,7 @@ def get_dataset(dataset, **kwargs):
         if "out" in dataset:
             default_time_settings = {"max_num_time_steps": 10, "time_step_size": 2}
         else:
-            default_time_settings = {"max_num_time_steps": 7, "time_step_size": 2} # it is passed through kwargs
+            default_time_settings = {"max_num_time_steps": 100, "time_step_size": 2} # it is passed through kwargs
         if "tracer" in dataset:
             tracer = True
         else:

@@ -194,9 +194,9 @@ class CompressibleBase(BaseTimeDataset):
         super().__init__(*args, **kwargs)
         assert self.max_num_time_steps * self.time_step_size <= 200
 
-        self.N_max = 20000
-        self.N_val = 120
-        self.N_test = 240
+        self.N_max = 3
+        self.N_val = 1
+        self.N_test = 1
         self.resolution = 128 # here will be 352 in new data
         self.tracer = tracer
 
@@ -256,11 +256,11 @@ class CompressibleBase(BaseTimeDataset):
         #     .reshape(1, self.resolution, self.resolution)
         # )
 
-        inputs[3] = inputs[3] - self.mean_pressure
-        label[3] = label[3] - self.mean_pressure
+        # inputs[3] = inputs[3] - self.mean_pressure
+        # label[3] = label[3] - self.mean_pressure
 
-        inputs = (inputs - self.constants["mean"]) / self.constants["std"]
-        label = (label - self.constants["mean"]) / self.constants["std"]
+        # inputs = (inputs - self.constants["mean"]) / self.constants["std"]
+        # label = (label - self.constants["mean"]) / self.constants["std"]
 
         if self.tracer:
             input_tracer = (
@@ -332,7 +332,5 @@ class RiemannKelvinHelmholtz(CompressibleBase):
         
 class Bubble(CompressibleBase):
     def __init__(self, *args, tracer=False, **kwargs):
-        self.mean_pressure = 0.0
-        file_path = "/JXF.nc"
-        # file_path = "/JXF_onlyP.nc"
+        file_path = "/JXF_ND.nc"
         super().__init__(file_path, *args, tracer=tracer, **kwargs)

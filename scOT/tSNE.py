@@ -11,13 +11,13 @@ import matplotlib.pyplot as plt
 
 # Generate example datasets
 np.random.seed(42)
-jxf = np.load("/home/szehisaadat/sahba_work/poseidon/JXF.npy").mean(axis=1)
-rp = np.load("/home/szehisaadat/sahba_work/poseidon/CE-RP.npy").mean(axis=1)
-crp = np.load("/home/szehisaadat/sahba_work/poseidon/CE-CRP.npy").mean(axis=1)
-kh = np.load("/home/szehisaadat/sahba_work/poseidon/CE-KH.npy").mean(axis=1)
-ceg = np.load("/home/szehisaadat/sahba_work/poseidon/CE-Gauss.npy").mean(axis=1)
-nsg = np.load("/home/szehisaadat/sahba_work/poseidon/NS-Gauss.npy").mean(axis=1)
-nss = np.load("/home/szehisaadat/sahba_work/poseidon/NS-Gauss.npy").mean(axis=1)
+jxf = np.load("/home/szehisaadat/sahba_work/poseidon/data/npys_for_tSNE/JXF.npy").mean(axis=1)
+rp = np.load("/home/szehisaadat/sahba_work/poseidon/data/npys_for_tSNE/CE-RP.npy").mean(axis=1)
+crp = np.load("/home/szehisaadat/sahba_work/poseidon/data/npys_for_tSNE/CE-CRP.npy").mean(axis=1)
+kh = np.load("/home/szehisaadat/sahba_work/poseidon/data/npys_for_tSNE/CE-KH.npy").mean(axis=1)
+ceg = np.load("/home/szehisaadat/sahba_work/poseidon/data/npys_for_tSNE/CE-Gauss.npy").mean(axis=1)
+nsg = np.load("/home/szehisaadat/sahba_work/poseidon/data/npys_for_tSNE/NS-Gauss.npy").mean(axis=1)
+nss = np.load("/home/szehisaadat/sahba_work/poseidon/data/npys_for_tSNE/NS-Gauss.npy").mean(axis=1)
 
 # Combine datasets
 data = np.vstack((jxf, rp, crp, kh, ceg, nsg, nss))

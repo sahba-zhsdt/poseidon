@@ -49,6 +49,7 @@ from transformers.utils import ModelOutput
 from dataclasses import dataclass
 import torch
 from torch import nn
+import torch.nn.functional as F
 from typing import Optional, Union, Tuple, List
 import math
 import collections
@@ -1322,6 +1323,9 @@ class ScOT(Swinv2PreTrainedModel):
             if output_hidden_states is not None
             else self.config.output_hidden_states
         )
+        
+        # pixel_values = F.interpolate(pixel_values, size=(128, 128), mode='bilinear', align_corners=False)
+        # labels = F.interpolate(labels, size=(128, 128), mode='bilinear', align_corners=False)
 
         if pixel_values is None:
             raise ValueError("pixel_values cannot be None")
@@ -1351,13 +1355,7 @@ class ScOT(Swinv2PreTrainedModel):
         )
         
         import numpy as np
-        # np.save('CE-RP.npy', embedding_output.detach().cpu().numpy())
-        # np.save('CE-CRP.npy', embedding_output.detach().cpu().numpy())
-        # np.save('CE-KH.npy', embedding_output.detach().cpu().numpy())
-        # np.save('CE-Gauss.npy', embedding_output.detach().cpu().numpy())
-        np.save('NS-Sines.npy', embedding_output.detach().cpu().numpy())
-        # np.save('NS-Gauss.npy', embedding_output.detach().cpu().numpy())
-        # np.save('JXF.npy', embedding_output.detach().cpu().numpy())
+        # np.save('data/npys_for_tSNE/JXF.npy', embedding_output.detach().cpu().numpy())
 
         encoder_outputs = self.encoder(
             embedding_output,
@@ -1420,6 +1418,28 @@ class ScOT(Swinv2PreTrainedModel):
             else:
                 raise ValueError("p must be 1 or 2")
             if self.config.channel_slice_list_normalized_loss is not None:
+                
+                ###
+                # for i in range(len(self.config.channel_slice_list_normalized_loss) - 1):
+                    
+                #     a = [loss_fn(
+                #        prediction[:,self.config.channel_slice_list_normalized_loss[i] : self.config.channel_slice_list_normalized_loss[i + 1],],
+                #        labels[:,self.config.channel_slice_list_normalized_loss[i] : self.config.channel_slice_list_normalized_loss[i + 1],]
+                #     )
+                #          /
+                #     (
+                #         loss_fn(
+                #           labels[:,self.config.channel_slice_list_normalized_loss[i] : self.config.channel_slice_list_normalized_loss[i + 1],],
+                #           torch.zeros_like(labels[:,self.config.channel_slice_list_normalized_loss[i] : self.config.channel_slice_list_normalized_loss[i + 1],])
+                #         ) 
+                #         + 1e-1
+                #     )]
+                
+                
+                ###
+                
+                
+                
                 loss = torch.mean(
                     torch.stack(
                         [

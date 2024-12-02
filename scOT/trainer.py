@@ -314,13 +314,13 @@ class Trainer(Trainer_):
                             params["embeddings"].append(p)
                         elif n in decay_parameters and p.requires_grad:
                             params["standard"].append(p)
-                            # p.requires_grad=False
+                            p.requires_grad=False
                         elif p.requires_grad:
                             if n in time_embedding_params:
                                 params["time_embedding"].append(p)
                             else:
                                 params["no_weight_decay"].append(p)
-                                # p.requires_grad=False
+                                p.requires_grad=False
                     optimizer_grouped_parameters = [
                         {
                             "params": params["standard"],
