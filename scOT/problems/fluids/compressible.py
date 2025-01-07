@@ -197,7 +197,7 @@ class CompressibleBase(BaseTimeDataset):
         self.N_max = 3
         self.N_val = 1
         self.N_test = 1
-        self.resolution = 128 # here will be 352 in new data
+        self.resolution = 256 # here will be 352 in new data
         self.tracer = tracer
 
         data_path = self.data_path + file_path
@@ -207,26 +207,26 @@ class CompressibleBase(BaseTimeDataset):
 
         self.constants = copy.deepcopy(CONSTANTS)
 
-        # self.input_dim = 1
-        # self.label_description = (
-        #     "[p]"
-        # )
-
-        # self.pixel_mask = (
-        #     torch.tensor([False])
-        # )
-        
-        
-        self.input_dim = 4 if not tracer else 5
+        self.input_dim = 2
         self.label_description = (
-            "[rho],[u,v],[p]" if not tracer else "[rho],[u,v],[p],[tracer]"
+            "[p],[vf]"
         )
 
         self.pixel_mask = (
-            torch.tensor([False, False, False, False])
-            if not tracer
-            else torch.tensor([False, False, False, False, False])
+            torch.tensor([False, False])
         )
+        
+        
+        # self.input_dim = 4 if not tracer else 5
+        # self.label_description = (
+        #     "[rho],[u,v],[p]" if not tracer else "[rho],[u,v],[p],[tracer]"
+        # )
+
+        # self.pixel_mask = (
+        #     torch.tensor([False, False, False, False])
+        #     if not tracer
+        #     else torch.tensor([False, False, False, False, False])
+        # )
 
         self.post_init()
 
@@ -234,27 +234,27 @@ class CompressibleBase(BaseTimeDataset):
         i, t, t1, t2 = self._idx_map(idx)
         time = t / self.constants["time"]
 
-        inputs = (
-            torch.from_numpy(self.reader["data"][i + self.start, t1, 0:4])
-            .type(torch.float32)
-            .reshape(4, self.resolution, self.resolution)
-        )
-        label = (
-            torch.from_numpy(self.reader["data"][i + self.start, t2, 0:4])
-            .type(torch.float32)
-            .reshape(4, self.resolution, self.resolution)
-        )
-        
         # inputs = (
-        #     torch.from_numpy(self.reader["data"][i + self.start, t1, 0:1])
+        #     torch.from_numpy(self.reader["data"][i + self.start, t1, 0:4])
         #     .type(torch.float32)
-        #     .reshape(1, self.resolution, self.resolution)
+        #     .reshape(4, self.resolution, self.resolution)
         # )
         # label = (
-        #     torch.from_numpy(self.reader["data"][i + self.start, t2, 0:1])
+        #     torch.from_numpy(self.reader["data"][i + self.start, t2, 0:4])
         #     .type(torch.float32)
-        #     .reshape(1, self.resolution, self.resolution)
+        #     .reshape(4, self.resolution, self.resolution)
         # )
+        
+        inputs = (
+            torch.from_numpy(self.reader["data"][i + self.start, t1, 0:2])
+            .type(torch.float32)
+            .reshape(1, self.resolution, self.resolution)
+        )
+        label = (
+            torch.from_numpy(self.reader["data"][i + self.start, t2, 0:2])
+            .type(torch.float32)
+            .reshape(1, self.resolution, self.resolution)
+        )
 
         # inputs[3] = inputs[3] - self.mean_pressure
         # label[3] = label[3] - self.mean_pressure
@@ -332,5 +332,5 @@ class RiemannKelvinHelmholtz(CompressibleBase):
         
 class Bubble(CompressibleBase):
     def __init__(self, *args, tracer=False, **kwargs):
-        file_path = "/JXF_ND.nc"
+        file_path = "/JXFn.nc"
         super().__init__(file_path, *args, tracer=tracer, **kwargs)
