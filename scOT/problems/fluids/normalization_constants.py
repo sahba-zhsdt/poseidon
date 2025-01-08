@@ -6,7 +6,7 @@ CONSTANTS = {
     "mean": torch.tensor([0.0, 0.0, 0.0, 0.0]).unsqueeze(1).unsqueeze(1),
     "std": torch.tensor([0.0, 0.0, 0.0, 0.0]).unsqueeze(1).unsqueeze(1),
     # "time": 20.0,
-    "time": 200.0,
+    "time": 165.0,
     # "tracer_mean": 0.19586183,
     # "tracer_std": 0.37,
 }

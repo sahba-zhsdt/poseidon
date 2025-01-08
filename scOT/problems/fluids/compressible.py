@@ -197,7 +197,7 @@ class CompressibleBase(BaseTimeDataset):
         self.N_max = 3
         self.N_val = 1
         self.N_test = 1
-        self.resolution = 256 # here will be 352 in new data
+        self.resolution = 256 # here will be 256 in new data
         self.tracer = tracer
 
         data_path = self.data_path + file_path
@@ -248,12 +248,12 @@ class CompressibleBase(BaseTimeDataset):
         inputs = (
             torch.from_numpy(self.reader["data"][i + self.start, t1, 0:2])
             .type(torch.float32)
-            .reshape(1, self.resolution, self.resolution)
+            .reshape(2, self.resolution, self.resolution)
         )
         label = (
             torch.from_numpy(self.reader["data"][i + self.start, t2, 0:2])
             .type(torch.float32)
-            .reshape(1, self.resolution, self.resolution)
+            .reshape(2, self.resolution, self.resolution)
         )
 
         # inputs[3] = inputs[3] - self.mean_pressure
