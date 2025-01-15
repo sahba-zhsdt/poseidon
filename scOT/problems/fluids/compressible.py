@@ -197,7 +197,7 @@ class CompressibleBase(BaseTimeDataset):
         self.N_max = 3
         self.N_val = 1
         self.N_test = 1
-        self.resolution = 256 # here will be 352 in new data
+        self.resolution = 128 # here will be 352 in new data
         self.tracer = tracer
 
         data_path = self.data_path + file_path
@@ -207,14 +207,15 @@ class CompressibleBase(BaseTimeDataset):
 
         self.constants = copy.deepcopy(CONSTANTS)
 
-        self.input_dim = 2
+        self.input_dim = 1
         self.label_description = (
-            "[p],[vf]"
+            "[channel 0]"
         )
 
         self.pixel_mask = (
-            torch.tensor([False, False])
+            torch.tensor([False])
         )
+        #check this later for Bp C trainings!!
         
         
         # self.input_dim = 4 if not tracer else 5
@@ -226,6 +227,10 @@ class CompressibleBase(BaseTimeDataset):
         #     torch.tensor([False, False, False, False])
         #     if not tracer
         #     else torch.tensor([False, False, False, False, False])
+        # )
+        
+        # self.pixel_mask = (
+        #     torch.tensor([False])
         # )
 
         self.post_init()
@@ -246,12 +251,12 @@ class CompressibleBase(BaseTimeDataset):
         # )
         
         inputs = (
-            torch.from_numpy(self.reader["data"][i + self.start, t1, 0:2])
+            torch.from_numpy(self.reader["data"][i + self.start, t1, 0:1])
             .type(torch.float32)
             .reshape(1, self.resolution, self.resolution)
         )
         label = (
-            torch.from_numpy(self.reader["data"][i + self.start, t2, 0:2])
+            torch.from_numpy(self.reader["data"][i + self.start, t2, 0:1])
             .type(torch.float32)
             .reshape(1, self.resolution, self.resolution)
         )
@@ -330,7 +335,42 @@ class RiemannKelvinHelmholtz(CompressibleBase):
             )
         super().__init__(file_path, *args, tracer=tracer, **kwargs)
         
-class Bubble(CompressibleBase):
+class BubbleB(CompressibleBase):
     def __init__(self, *args, tracer=False, **kwargs):
-        file_path = "/JXFn.nc"
+        file_path = "/JXFs_128.nc"
+        super().__init__(file_path, *args, tracer=tracer, **kwargs)
+
+class BubbleBp(CompressibleBase):
+    def __init__(self, *args, tracer=False, **kwargs):
+        file_path = "/JXFdensity_s_128.nc"
+        super().__init__(file_path, *args, tracer=tracer, **kwargs) 
+              
+class BubbleC(CompressibleBase):
+    def __init__(self, *args, tracer=False, **kwargs):
+        file_path = "/JXFdensity_n_128.nc"
+        super().__init__(file_path, *args, tracer=tracer, **kwargs)
+        
+class BubbleD(CompressibleBase):
+    def __init__(self, *args, tracer=False, **kwargs):
+        file_path = "/JXFWG_density_ssk_128.nc"
+        super().__init__(file_path, *args, tracer=tracer, **kwargs)
+
+class BubbleDp(CompressibleBase):
+    def __init__(self, *args, tracer=False, **kwargs):
+        file_path = "/JXFWG_density_s_128.nc"
+        super().__init__(file_path, *args, tracer=tracer, **kwargs)
+        
+class BubbleE(CompressibleBase):
+    def __init__(self, *args, tracer=False, **kwargs):
+        file_path = "/JXFWG_density_n_128.nc"
+        super().__init__(file_path, *args, tracer=tracer, **kwargs)
+        
+class BubbleH(CompressibleBase):
+    def __init__(self, *args, tracer=False, **kwargs):
+        file_path = "/JXFpressure_n_128.nc"
+        super().__init__(file_path, *args, tracer=tracer, **kwargs)
+
+class BubbleHp(CompressibleBase):
+    def __init__(self, *args, tracer=False, **kwargs):
+        file_path = "/JXFpressure_Mn_128.nc"
         super().__init__(file_path, *args, tracer=tracer, **kwargs)

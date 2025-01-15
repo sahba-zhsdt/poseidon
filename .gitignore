@@ -160,8 +160,11 @@ cython_debug/
 #.idea/
 
 /data
-/ckpts
+/ckpts*
+/predictions_plot
 /HF
 /python=3.10
 /wandb
-
+slurm-*.out
+tSNE-test.png
+job.slurm

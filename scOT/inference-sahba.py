@@ -45,7 +45,7 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
     o_time = kwargs['final_time']
     dt = o_time - i_time
 
-    fig = plt.figure(figsize=(40, 35))
+    fig = plt.figure(figsize=(30, 15))
     grid = ImageGrid(
         fig, 111, nrows_ncols=(predictions.shape[1], 3), axes_pad=0.5, 
         cbar_mode="each", cbar_pad=0.2, cbar_size="4%", cbar_location="right",
@@ -72,7 +72,7 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
                 vmin=vmin[i//3],
                 vmax=vmax[i//3],
             )
-            ax.set_title(f"Initial State channel {i//3} @ time step {i_time}")
+            ax.set_title(f"Initial State channel {i//3} @ time step {i_time}", fontsize=25)
             cbar = grid.cbar_axes[_i].colorbar(im)
             
         elif _i % 3 == 1:
@@ -83,7 +83,7 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
                 vmin=vmin[i//3],
                 vmax=vmax[i//3],
             )
-            ax.set_title(f"Ground Truth channel {i//3} @ time step {o_time}")
+            ax.set_title(f"Ground Truth channel {i//3} @ time step {o_time}", fontsize=25)
             cbar = grid.cbar_axes[_i].colorbar(im)
             
         else:
@@ -94,14 +94,14 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
                 vmin=vmin[i//3],
                 vmax=vmax[i//3],
             )
-            ax.set_title(f"Predicted channel {i//3} @ time step {o_time}")
+            ax.set_title(f"Predicted channel {i//3} @ time step {o_time}", fontsize=25)
             cbar = grid.cbar_axes[_i].colorbar(im)
 
         ax.set_xticks([])
         ax.set_yticks([])
     
-    plt.suptitle(f"Prediction after {dt} time steps", fontsize=25)
-    plt.savefig("./predictionB.png")
+    plt.suptitle(f"Prediction after {dt} time steps", fontsize=40, y=0.85)
+    plt.savefig("./ckptsH/predictionB.png")
 
 
 
@@ -486,6 +486,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--ar_steps",
         type=int,
+        # default=[1],
         default=None,
         help="Number of autoregressive steps to take. A single int n is interpreted as taking n homogeneous steps, a list of ints [j_0, j_1, ...] is interpreted as taking a step of size j_i.",
     )

@@ -4,7 +4,7 @@ Can be also used for finetuning Poseidon.
 Can be used in a single config or sweep setup.
 """
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "7,6,5,4"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "7,6,5,4"
 import argparse
 import torch
 import wandb
