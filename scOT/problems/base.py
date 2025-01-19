@@ -416,5 +416,5 @@ class TimeWrapper(BaseTimeDataset):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        # return {**self.dataset[idx], "time": 1.0} # with this change, I didn't observe any serious change in results. I clear the ckpt
-        return {**self.dataset[idx]}
+        return {**self.dataset[idx], "time": 1.0} # with this change, I didn't observe any serious change in results. I clear the ckpt
+        # return {**self.dataset[idx]}

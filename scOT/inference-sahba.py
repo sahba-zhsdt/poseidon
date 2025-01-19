@@ -101,7 +101,7 @@ def create_predictions_plot_infer(inputs, predictions, labels, **kwargs):
         ax.set_yticks([])
     
     plt.suptitle(f"Prediction after {dt} time steps", fontsize=40, y=0.85)
-    plt.savefig("./ckptsH/predictionB.png")
+    plt.savefig("./ckptsBp/predictionB.png")
 
 
 

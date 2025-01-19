@@ -342,12 +342,12 @@ class BubbleB(CompressibleBase):
 
 class BubbleBp(CompressibleBase):
     def __init__(self, *args, tracer=False, **kwargs):
-        file_path = "/JXFdensity_s_128.nc"
+        file_path = "/JXFdensity_N_128.nc"
         super().__init__(file_path, *args, tracer=tracer, **kwargs) 
               
 class BubbleC(CompressibleBase):
     def __init__(self, *args, tracer=False, **kwargs):
-        file_path = "/JXFdensity_n_128.nc"
+        file_path = "/JXFdensity_nV2_128.nc"
         super().__init__(file_path, *args, tracer=tracer, **kwargs)
         
 class BubbleD(CompressibleBase):
