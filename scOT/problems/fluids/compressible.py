@@ -208,11 +208,13 @@ class CompressibleBase(BaseTimeDataset):
         self.constants = copy.deepcopy(CONSTANTS)
 
         self.input_dim = 1
+        self.input_dim = 1
         self.label_description = (
             "[channel 0]"
         )
 
         self.pixel_mask = (
+            torch.tensor([False])
             torch.tensor([False])
         )
         #check this later for Bp C trainings!!
@@ -252,10 +254,12 @@ class CompressibleBase(BaseTimeDataset):
         
         inputs = (
             torch.from_numpy(self.reader["data"][i + self.start, t1, 0:1])
+            torch.from_numpy(self.reader["data"][i + self.start, t1, 0:1])
             .type(torch.float32)
             .reshape(1, self.resolution, self.resolution)
         )
         label = (
+            torch.from_numpy(self.reader["data"][i + self.start, t2, 0:1])
             torch.from_numpy(self.reader["data"][i + self.start, t2, 0:1])
             .type(torch.float32)
             .reshape(1, self.resolution, self.resolution)
