@@ -1312,6 +1312,11 @@ class ScOT(Swinv2PreTrainedModel):
         return_dict = (
             return_dict if return_dict is not None else self.config.use_return_dict
         )
+        # import matplotlib.pyplot as plt
+        # plt.imshow(labels[0,0,:,:], cmap='viridis')
+        # plt.colorbar(label='Value')
+        # plt.title('2D Tensor Visualization')
+        # plt.savefig("./labels.png")
 
         output_attentions = (
             output_attentions

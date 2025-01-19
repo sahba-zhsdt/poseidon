@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 /data
-/ckpts
+/ckpts*
 /HF
 /python=3.10
 /wandb
