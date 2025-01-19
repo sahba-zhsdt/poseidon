@@ -104,9 +104,10 @@ def get_dataset(dataset, **kwargs):
                         raise ValueError(f"Unknown dataset {dataset}")
                 else:
                     raise ValueError(f"Unknown dataset {dataset}")
-            elif "BubbleB" in dataset:
-                from .fluids.compressible import BubbleB as dset
+            # elif "BubbleB" in dataset:
+            #     from .fluids.compressible import BubbleB as dset
             elif "BubbleBp" in dataset:
+                print("BubbleBp from base")
                 from .fluids.compressible import BubbleBp as dset
             elif "BubbleC" in dataset:
                 from .fluids.compressible import BubbleC as dset
