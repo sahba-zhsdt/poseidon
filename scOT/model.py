@@ -1312,11 +1312,11 @@ class ScOT(Swinv2PreTrainedModel):
         return_dict = (
             return_dict if return_dict is not None else self.config.use_return_dict
         )
-        import matplotlib.pyplot as plt
-        plt.imshow(pixel_values[0,0].cpu(), cmap='viridis')
-        plt.colorbar(label='Value')
-        plt.title('Pixel values')
-        plt.savefig("./input.png")
+        # import matplotlib.pyplot as plt
+        # plt.imshow(pixel_values[0,0].cpu(), cmap='viridis')
+        # # plt.colorbar(label='Value')
+        # plt.title('Pixel values')
+        # plt.savefig("./input.png")
 
         output_attentions = (
             output_attentions

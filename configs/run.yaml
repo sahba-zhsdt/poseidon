@@ -1,7 +1,7 @@
 dataset:
-  value: "fluids.compressible.BubbleBp"
+  value: "fluids.compressible.Bubble"
 num_trajectories:
-  value: 1
+  value: 3
 model_name:
   value: "B"
 lr:

@@ -194,7 +194,7 @@ class CompressibleBase(BaseTimeDataset):
         super().__init__(*args, **kwargs)
         assert self.max_num_time_steps * self.time_step_size <= 200
 
-        self.N_max = 3
+        self.N_max = 5
         self.N_val = 1
         self.N_test = 1
         self.resolution = 128 # here will be 352 in new data
@@ -337,7 +337,7 @@ class RiemannKelvinHelmholtz(CompressibleBase):
         
 class BubbleB(CompressibleBase):
     def __init__(self, *args, tracer=False, **kwargs):
-        file_path = "/JXFs_128.nc"
+        file_path = "/JXFdensity_FullTrain.nc"
         super().__init__(file_path, *args, tracer=tracer, **kwargs)
 
 class BubbleBp(CompressibleBase):
